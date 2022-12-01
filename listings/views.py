@@ -63,3 +63,36 @@ def band_create(request):
         # retourne le template html
     return render(request,
             'listings/band_create.html',{'form': form})
+    
+    
+def band_update(request, id):
+    # on créer un nouvel object 'band' depuis la bdd a partir du model de class et l'id  
+    band = Band.objects.get(id=id)
+
+    # si la request est de type 'POST'
+    if request.method == 'POST':
+        # le formulaire sera celui de la class Bandform est sera pré-rempli avec les donné de l'instance 'band' créer plus tot 
+        form = BandForm(request.POST, instance=band)
+        # si le formulaire est valide
+        if form.is_valid():
+            # mettre à jour le groupe existant dans la base de données
+            form.save()
+            # rediriger vers la page détaillée du groupe que nous venons de mettre à jour
+            return redirect('band-detail', band.id)
+    else:
+        # on re-affiche le formulaire avec les même donnée (comme si non modifiées)
+        form = BandForm(instance=band)
+        # on retourne notre template html band_update.html
+    return render(request, 'listings/band_update.html', {'form': form})
+
+
+
+def band_delete(request, id): 
+    band = Band.objects.get(id=id)
+    
+    if request.method == 'POST':
+        # on supprime le groupe de la base de données 
+        band.delete()
+        # et on redirige vers la liste des groupes
+        return redirect('band-list')
+    return render(request, 'listings/band_delete.html', {'band': band}) 
